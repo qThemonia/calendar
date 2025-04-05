@@ -1,0 +1,27 @@
+{
+  "name": "calendar",
+  "version": "1.0.0",
+  "description": "Calendar app for Windows",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "data"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qThemonia/calendar.git"
+  },
+  "keywords": [
+    "calendar",
+    "app"
+  ],
+  "author": "Emre Soybas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qThemonia/calendar/issues"
+  },
+  "homepage": "https://github.com/qThemonia/calendar#readme",
+  "devDependencies": {
+    "electron": "^35.1.4"
+  }
+}
