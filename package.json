@@ -1,11 +1,13 @@
 {
   "name": "calendar",
   "version": "1.0.0",
-  "description": "Calendar app for Windows",
+  "description": "Emre Soybas' calendar app for Windows",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "data"
+    "start": "electron-forge start",
+    "test": "data",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,17 @@
   },
   "homepage": "https://github.com/qThemonia/calendar#readme",
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.0",
+    "@electron-forge/maker-deb": "^7.8.0",
+    "@electron-forge/maker-rpm": "^7.8.0",
+    "@electron-forge/maker-squirrel": "^7.8.0",
+    "@electron-forge/maker-zip": "^7.8.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.0",
+    "@electron-forge/plugin-fuses": "^7.8.0",
+    "@electron/fuses": "^1.8.0",
     "electron": "^35.1.4"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1"
   }
 }
