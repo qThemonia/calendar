@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron/main');
+const { VelopackApp } = require('velopack');
 const path = require('node:path');
 
 const createWindow = () => {
@@ -14,8 +15,35 @@ const createWindow = () => {
   win.loadFile('index.html');
 };
 
+VelopackApp.build();
+ipcMain.handle("velopack:get-version", () => {
+  try {
+    const updateManager = new UpdateManager(updateUrl);
+    return updateManager.getCurrentVersion();
+  } catch (e) {
+    return `Not Installed (${e})`;
+  }
+});
+
+ipcMain.handle("velopack:check-for-update", async () => {
+  const updateManager = new UpdateManager(updateUrl);
+  return await updateManager.checkForUpdatesAsync();
+});
+
+ipcMain.handle("velopack:download-update", async (_, updateInfo) => {
+  const updateManager = new UpdateManager(updateUrl);
+  await updateManager.downloadUpdateAsync(updateInfo);
+  return true;
+});
+
+ipcMain.handle("velopack:apply-update", async (_, updateInfo) => {
+  const updateManager = new UpdateManager(updateUrl);
+  await updateManager.waitExitThenApplyUpdate(updateInfo);
+  app.quit();
+  return true;
+});
+
 app.whenReady().then(() => {
-  ipcMain.handle('ping', () => 'pong');
   createWindow();
 
   app.on('activate', () => {
@@ -30,7 +58,3 @@ app.on('window-all-closed', () => {
     app.quit()
   };
 });
-
-console.log("App directory:", __dirname);
-
-console.log("hello");
