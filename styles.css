@@ -1,0 +1,26 @@
+html,body{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+#home-ui{
+    height: 100%;
+    width: 100%;
+    display: grid;
+    transition: 300ms;
+    grid-template-columns: 5% auto;
+}
+
+#home-ui-wrapper{
+    background-color: rgb(227, 150, 62);
+}
+
+#sidebar-wrapper{
+    background-color: rgb(210, 125, 45);
+    border-right: 5px solid rgb(168, 100, 35);
+}
+
+#home-ui:has(#sidebar-wrapper:hover){
+    grid-template-columns: 15% auto;
+}
