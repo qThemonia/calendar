@@ -1,11 +1,11 @@
 {
   "name": "timely",
   "version": "1.0.0",
+  "type": "module",
   "description": "Emre Soybas' calendar app for Windows",
   "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
-    "dev": "nodemon --exec electron .",
     "test": "data",
     "package": "electron-forge package",
     "make": "electron-forge make"
@@ -33,7 +33,7 @@
     "@electron-forge/plugin-fuses": "^7.8.0",
     "@electron/fuses": "^1.8.0",
     "electron": "^35.1.4",
-    "nodemon": "^3.1.9"
+    "electron-reload-esm": "^1.0.1"
   },
   "dependencies": {
     "velopack": "^0.0.1213-g57cf68d"

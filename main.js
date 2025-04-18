@@ -1,47 +1,34 @@
-const { app, BrowserWindow, ipcMain } = require('electron/main');
-const { VelopackApp } = require('velopack');
-const path = require('node:path');
+import { fileURLToPath }       from 'url';
+import { dirname, join }       from 'path';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { electronReload } from 'electron-reload-esm';
+import { VelopackApp }         from 'velopack';
+import { passQuotes }          from './quotes.js';
 
-const createWindow = () => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = dirname(__filename);
+
+const electronPath = process.execPath;
+
+electronReload(__dirname, {
+  electron: electronPath
+});
+
+VelopackApp.build();
+
+function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 2560,
+    height: 1600,
     frame: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: join(__dirname, 'preload.js'),
     }
   });
 
   win.loadFile('index.html');
-};
-
-VelopackApp.build();
-ipcMain.handle("velopack:get-version", () => {
-  try {
-    const updateManager = new UpdateManager(updateUrl);
-    return updateManager.getCurrentVersion();
-  } catch (e) {
-    return `Not Installed (${e})`;
-  }
-});
-
-ipcMain.handle("velopack:check-for-update", async () => {
-  const updateManager = new UpdateManager(updateUrl);
-  return await updateManager.checkForUpdatesAsync();
-});
-
-ipcMain.handle("velopack:download-update", async (_, updateInfo) => {
-  const updateManager = new UpdateManager(updateUrl);
-  await updateManager.downloadUpdateAsync(updateInfo);
-  return true;
-});
-
-ipcMain.handle("velopack:apply-update", async (_, updateInfo) => {
-  const updateManager = new UpdateManager(updateUrl);
-  await updateManager.waitExitThenApplyUpdate(updateInfo);
-  app.quit();
-  return true;
-});
+  win.setMenuBarVisibility(false);
+}
 
 app.whenReady().then(() => {
   createWindow();
@@ -55,6 +42,38 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
-  };
+    app.quit();
+  }
+});
+
+//
+// Velopack IPC handlers:
+//
+/* const updateUrl = update URL here */
+
+ipcMain.handle('velopack:get-version', () => {
+  try {
+    const updateManager = new UpdateManager(updateUrl);
+    return updateManager.getCurrentVersion();
+  } catch (e) {
+    return `Not Installed (${e})`;
+  }
+});
+
+ipcMain.handle('velopack:check-for-update', async () => {
+  const updateManager = new UpdateManager(updateUrl);
+  return await updateManager.checkForUpdatesAsync();
+});
+
+ipcMain.handle('velopack:download-update', async (_event, updateInfo) => {
+  const updateManager = new UpdateManager(updateUrl);
+  await updateManager.downloadUpdateAsync(updateInfo);
+  return true;
+});
+
+ipcMain.handle('velopack:apply-update', async (_event, updateInfo) => {
+  const updateManager = new UpdateManager(updateUrl);
+  await updateManager.waitExitThenApplyUpdate(updateInfo);
+  app.quit();
+  return true;
 });
