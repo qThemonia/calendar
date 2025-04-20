@@ -12,15 +12,40 @@ html,body{
     grid-template-columns: 5% auto;
 }
 
-#home-ui-wrapper{
-    background-color: rgb(227, 150, 62);
-}
-
-#sidebar-wrapper{
-    background-color: rgb(210, 125, 45);
+#sidebar-container{
+    background-color: rgb(255, 158, 68);
     border-right: 5px solid rgb(168, 100, 35);
 }
 
-#home-ui:has(#sidebar-wrapper:hover){
+#home-ui:has(#sidebar-container:hover){
     grid-template-columns: 15% auto;
+}
+
+#home-ui-container{
+    background-color: rgb(255, 192, 132);
+    grid-template-columns: auto 40vw 30vw;
+    display: grid;
+    grid-template-rows: 5% 95%;
+
+}
+
+#checklist-container{
+    background-color: aqua;
+    grid-row: 2;
+}
+
+#calendar-container{
+    background-color: blue;
+    grid-row: 2;
+}
+
+#event-container{
+    background-color: brown;
+    grid-row: 2;
+}
+
+#quote-container{
+    background-color: black;
+    grid-row: 1;
+    grid-column: 1 / 4;
 }

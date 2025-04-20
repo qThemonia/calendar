@@ -18,16 +18,19 @@ VelopackApp.build();
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 2560,
-    height: 1600,
+    width: 1280,
+    height: 800,
     frame: true,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
     }
   });
-
+  win.maximize();
   win.loadFile('index.html');
   win.setMenuBarVisibility(false);
+  win.setAlwaysOnTop(true);
+  win.show();
+  win.setAlwaysOnTop(false);
 }
 
 app.whenReady().then(() => {
