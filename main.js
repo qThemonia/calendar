@@ -3,7 +3,6 @@ import { dirname, join }       from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { electronReload } from 'electron-reload-esm';
 import { VelopackApp }         from 'velopack';
-import { passQuotes }          from './quotes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = dirname(__filename);
@@ -22,7 +21,8 @@ function createWindow() {
     height: 800,
     frame: true,
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.mjs'),
+      sandbox:false
     }
   });
   win.maximize();
@@ -80,3 +80,7 @@ ipcMain.handle('velopack:apply-update', async (_event, updateInfo) => {
   app.quit();
   return true;
 });
+
+// 
+// START WEB
+//

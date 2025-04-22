@@ -69,5 +69,6 @@ const quotes = [
   ];
 
 export function passQuotes() {
-    return quotes.length;
+  let randomQuote = Math.floor(Math.random() * quotes.length);
+  return quotes[randomQuote];
 }

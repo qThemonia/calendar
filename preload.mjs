@@ -1,12 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-contextBridge.exposeInMainWorld('versions', {
-    node: () => process.versions.node,
-    chrome: () => process.versions.chrome,
-    electron: () => process.versions.electron,
-    ping: () => ipcRenderer.invoke('ping')
-});
-
 // Create an API object to expose to renderer
 const velopackApi = {
     getVersion: () => ipcRenderer.invoke("velopack:get-version"),
