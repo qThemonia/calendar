@@ -23,9 +23,9 @@ html,body{
 
 #home-ui-container{
     background-color: rgb(255, 192, 132);
-    grid-template-columns: auto 40vw 30vw;
+    grid-template-columns: auto 55vw 25vw;
     display: grid;
-    grid-template-rows: 5% 95%;
+    grid-template-rows: 5% auto;
 
 }
 
@@ -45,7 +45,8 @@ html,body{
 }
 
 #quote-container{
-    background-color: black;
+    background-color: white;
     grid-row: 1;
     grid-column: 1 / 4;
+    text-align: center;
 }
