@@ -2,6 +2,8 @@ html,body{
     height: 100%;
     width: 100%;
     margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: rgb(255, 235, 218);
 }
 
 #home-ui{
@@ -15,6 +17,7 @@ html,body{
 #sidebar-container{
     background-color: rgb(255, 158, 68);
     border-right: 5px solid rgb(168, 100, 35);
+    box-shadow: 2px 0 10px rgba(168, 100, 35, 0.3);
 }
 
 #home-ui:has(#sidebar-container:hover){
@@ -22,31 +25,56 @@ html,body{
 }
 
 #home-ui-container{
-    background-color: rgb(255, 192, 132);
-    grid-template-columns: auto 55vw 25vw;
+    background-color: rgb(255, 210, 170);
+    grid-template-columns: 25vw auto 25vw;
     display: grid;
     grid-template-rows: 5% auto;
-
+    box-shadow: inset 0 0 20px rgba(168, 100, 35, 0.2);
 }
 
 #checklist-container{
-    background-color: aqua;
     grid-row: 2;
+    margin: 15px;
+    height: 85vh;
+    max-height: max-content;
 }
 
 #calendar-container{
-    background-color: blue;
+    background-color: rgb(255, 235, 218);
     grid-row: 2;
+    margin: 15px;
+    border: 2px solid rgb(168, 100, 35);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(168, 100, 35, 0.2);
+    max-height: max-content;
 }
 
 #event-container{
-    background-color: brown;
+    background-color: rgb(255, 235, 218);
     grid-row: 2;
+    margin: 15px;
+    border: 2px solid rgb(168, 100, 35);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(168, 100, 35, 0.2);
 }
 
 #quote-container{
-    background-color: white;
+    background-color: rgb(255, 174, 98);
     grid-row: 1;
     grid-column: 1 / 4;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(168, 100, 35, 0.3);
+    border-bottom: 2px solid rgb(168, 100, 35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#displayed-quote {
+    color: rgb(133, 68, 12);
+    font-style: italic;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 20px;
+    line-height: 1.5;
 }

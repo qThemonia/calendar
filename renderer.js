@@ -1,4 +1,6 @@
 import { passQuotes } from './quotes.js';
+import { ChecklistManager } from './checklist.js';
+import { CalendarManager } from './calendar.js';
 
 async function updateApp() {
     // Check for new version
@@ -12,11 +14,21 @@ async function updateApp() {
     
     // Install new version and restart app
     await window.velopackApi.applyUpdates(updateInfo);
-  }
+}
 
 function selectQuote(){
   let quoteString = passQuotes();
   document.getElementById("displayed-quote").innerHTML = quoteString;
 }
 
-selectQuote();
+// Initialize components
+document.addEventListener('DOMContentLoaded', () => {
+  // Select and display a random quote
+  selectQuote();
+  
+  // Initialize the checklist
+  const checklistManager = new ChecklistManager('checklist-container');
+  
+  // Initialize the calendar
+  const calendarManager = new CalendarManager('calendar-container');
+});
