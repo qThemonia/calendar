@@ -2,6 +2,7 @@
 export class CalendarManager {
     constructor(containerId) {
       this.container = document.getElementById(containerId);
+      this.eventManager = null;
       this.currentDate = new Date();
       this.currentMonth = this.currentDate.getMonth();
       this.currentYear = this.currentDate.getFullYear();
@@ -16,7 +17,10 @@ export class CalendarManager {
       this.render();
       this.setupEventListeners();
     }
-    
+    setEventManager(eventManager) {
+      this.eventManager = eventManager;
+      this.render(); // Re-render to show event indicators
+    }
     setupEventListeners() {
       // Find buttons by class within our specific container
       const prevButton = this.container.querySelector('.prev-month-btn');
@@ -50,7 +54,16 @@ export class CalendarManager {
         this.currentMonth = 11;
         this.currentYear--;
       }
-      this.selectedDay = 0;
+      
+      if (this.selectedDate) {
+        if (this.selectedDate.getMonth() === this.currentMonth && 
+            this.selectedDate.getFullYear() === this.currentYear) {
+          this.selectedDay = this.selectedDate.getDate();
+        } else {
+          this.selectedDay = 0;
+        }
+      }
+      
       this.render();
     }
     
@@ -140,7 +153,45 @@ export class CalendarManager {
         this.navigateMonth(1);
       }
     }
-    
+
+    getEventsForDay(year, month, day) {
+      // If we don't have a reference to the event manager, return empty array
+      if (!this.eventManager) return [];
+      
+      // Create target date at midnight for correct comparison
+      const targetDate = new Date(year, month, day);
+      targetDate.setHours(0, 0, 0, 0);
+      
+      return this.eventManager.events.filter(event => {
+        // Create a new date object from the event's due date
+        const eventDate = new Date(event.dueDate);
+        
+        // Set to midnight for comparison
+        eventDate.setHours(0, 0, 0, 0);
+        
+        // Compare dates using time value for accuracy
+        return eventDate.getTime() === targetDate.getTime();
+      });
+    }
+
+    getCalendarColor(eventTypeColor) {
+      // Create a mapping of event colors to calendar colors
+      // This can be customized to create any color mapping you want
+      const colorMap = {
+        // Map original event colors to bolder calendar colors
+        '#ff8a8a': '#ff2d2d', // Light red to bold red
+        '#ff9dff': '#e600e6', // Light pink to bold pink/magenta
+        '#a18dff': '#5a3fff', // Light purple to bold purple
+        '#7ba6ff': '#0066ff', // Light blue to bold blue
+        '#96ff96': '#00cc00', // Light green to bold green
+        '#fdff8f': '#e6e600', // Light yellow to bold yellow
+        '#ffb663': '#ff8000'  // Light orange to bold orange
+      };
+      
+      // Return the mapped color or the original color if no mapping exists
+      return colorMap[eventTypeColor] || eventTypeColor;
+    }
+
     render() {
       // Clear container
       this.container.innerHTML = '';
@@ -225,6 +276,45 @@ export class CalendarManager {
         // Add selected day highlight back
         if (this.isSelectedDay(day)) {
           dayElem.classList.add('selected-day');
+        }
+        
+        // Check if this day has events
+        const events = this.getEventsForDay(this.currentYear, this.currentMonth, day);
+      
+        if (events.length > 0) {
+          const eventTypes = events.map(event => event.type);
+
+          // Apply the appropriate coloring based on number of unique event types
+          if (eventTypes.length === 1) {
+            const eventType = this.eventManager.getEventTypeInfo(eventTypes[0]);
+            // Get the mapped bolder color
+            const calendarColor = this.getCalendarColor(eventType.color);
+            dayElem.style.backgroundColor = calendarColor;
+          } 
+          // For multiple event types
+          else if (eventTypes.length > 1) {
+            const sliceSize = 360 / eventTypes.length;
+            let gradientString = '';
+            
+            eventTypes.forEach((type, index) => {
+              const eventType = this.eventManager.getEventTypeInfo(type);
+              // Get the mapped bolder color
+              const calendarColor = this.getCalendarColor(eventType.color);
+              
+              const startAngle = index * sliceSize;
+              const endAngle = (index + 1) * sliceSize;
+              
+              gradientString += `${calendarColor} ${startAngle}deg, `;
+              gradientString += `${calendarColor} ${endAngle}deg${index < eventTypes.length - 1 ? ', ' : ''}`;
+            });
+            
+            dayElem.style.background = `conic-gradient(${gradientString})`;
+            dayElem.style.backgroundSize = "105% 105%";
+            dayElem.style.backgroundPosition = "center";
+          }
+          
+          // Add a class to indicate this day has events
+          dayElem.classList.add('has-events');
         }
         
         const dayNumber = document.createElement('span');

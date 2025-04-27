@@ -367,3 +367,35 @@
     color: rgb(255, 87, 34);
     transform: scale(1.2);
   }
+
+  
+/* Separator for prep tasks section */
+
+.prep-title {
+  color: rgb(133, 68, 12);
+  font-size: 1.2rem;
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.prep-items .checklist-item {
+  border-color: rgb(168, 100, 35);
+  border-left-style: solid;
+  background-color: rgb(255, 245, 235);
+}
+
+.details-button {
+  background: none;
+  border: none;
+  color: rgb(168, 100, 35);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  margin-left: 5px;
+  transition: all 0.2s ease;
+}
+
+.details-button:hover {
+  color: rgb(255, 87, 34);
+  transform: scale(1.2);
+}
