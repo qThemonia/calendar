@@ -230,7 +230,15 @@ export class EventManager {
     // Days of Notice input with info tooltip
     const noticeGroup = document.createElement('div');
     noticeGroup.className = 'form-group';
-    
+    noticeGroup.classList.add('notice-group');
+    const detailsRow = document.createElement('div');
+    detailsRow.className = 'form-row';
+
+    // Add all three groups to the row
+    detailsRow.appendChild(typeGroup);
+    detailsRow.appendChild(dateGroup);
+    detailsRow.appendChild(noticeGroup);
+
     const noticeLabel = document.createElement('label');
     noticeLabel.textContent = 'Days of Notice';
     noticeLabel.setAttribute('for', 'event-notice-days');
@@ -315,9 +323,7 @@ export class EventManager {
     
     // Build the form
     modalForm.appendChild(nameGroup);
-    modalForm.appendChild(typeGroup);
-    modalForm.appendChild(dateGroup);
-    modalForm.appendChild(noticeGroup);
+    modalForm.appendChild(detailsRow);
     modalForm.appendChild(descGroup);
     modalForm.appendChild(modalActions);
     
@@ -472,6 +478,8 @@ export class EventManager {
       this.saveEvents();
       this.closeModal();
       this.render();
+      this.checklistManager.render();
+      this.calendarManager.render();
   
       // Call the callback if provided
       if (typeof callback === 'function') {
@@ -486,6 +494,8 @@ export class EventManager {
       this.saveEvents();
       this.closeModal();
       this.render();
+      this.checklistManager.render();
+      this.calendarManager.render();
       
       // Call the callback if provided
       if (typeof callback === 'function') {
