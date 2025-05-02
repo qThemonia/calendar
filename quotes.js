@@ -24,7 +24,7 @@ const quotes = [
     "\"There must be something worth living for There must be something worth trying for Even some things worth dying for And if one man can stand tall There must be some hope for us all Somewhere, somewhere in the spirit of man\" - War of the Worlds musical by Jeff Wayne",
     //"\"Mother, I saw a dream in the night. There were stars in the sky for me.\" - The Epic of Gilgamesh (around 800 BC)",
     //"\"The greatest gain from space travel consists in the extension of our knowledge. In a hundred years this newly won knowledge will pay huge and unexpected dividends.\" - Wernher von Braun (1912-1977)",
-    "\"To go places and do things that have never been done before - that's what living is all about.\" - Michael Collins (1930-)",
+    "\"To go places and don things that have never been done before - that's what living is all about.\" - Michael Collins (1930-)",
     "\"It's human nature to stretch, to go, to see, to understand. Exploration is not a choice, really; it's an imperative.\" - Michael Collins (1930-)",
     "\"Don't tell me that man doesn't belong out there. Man belongs wherever he wants to go - and he'll do plenty well when he gets there.\" - Wernher von Braun (1912-1977)",
     "\"Hold fast to dreams, for if dreams die, life is a broken bird that cannot fly.\" - Langston Hughes (1902-1967)",

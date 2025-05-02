@@ -1,4 +1,4 @@
-// event.js
+// Updated EventManager class
 export class EventManager {
   constructor(containerId, calendarManager) {
     this.container = document.getElementById(containerId);
@@ -23,10 +23,11 @@ export class EventManager {
     this.saveEvents = this.saveEvents.bind(this);
     this.getUpcomingEvents = this.getUpcomingEvents.bind(this);
     this.getPreparationEvents = this.getPreparationEvents.bind(this);
-    
+    this.cleanupPastEvents = this.cleanupPastEvents.bind(this);
     
     // Initialize
     this.loadEvents();
+    this.cleanupPastEvents();
     this.createEventModal();
     
     // Subscribe to calendar selection changes
@@ -45,16 +46,61 @@ export class EventManager {
         this.render();
       };
     }
+    
     // Listen for event-completion-changed events
     document.addEventListener('event-completion-changed', () => {
       // Trigger a re-render of any components that need to show this event
-      // If we have a reference to the ChecklistManager, we could call its render method directly
       if (this.checklistManager) {
         this.checklistManager.render();
       }
     });
     
+    // Setup daily cleanup of past events
+    this.setupDailyCleanup();
+    
     this.render();
+  }
+  
+  // Add method for daily cleanup
+  setupDailyCleanup() {
+    // Clean up past events now
+    this.cleanupPastEvents();
+    
+    // Calculate time until next midnight
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeUntilMidnight = tomorrow - now;
+    
+    // Set a timeout to run at midnight, then set interval for daily
+    setTimeout(() => {
+      this.cleanupPastEvents();
+      // Set up daily interval (24 hours)
+      setInterval(this.cleanupPastEvents, 24 * 60 * 60 * 1000);
+    }, timeUntilMidnight);
+  }
+  
+  // Add method to clean up past events
+  cleanupPastEvents() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const originalLength = this.events.length;
+    
+    this.events = this.events.filter(event => {
+      const eventDate = new Date(event.dueDate);
+      eventDate.setHours(0, 0, 0, 0);
+      
+      // Keep events that are today or in the future, OR not completed
+      return eventDate >= today || !event.completed;
+    });
+    
+    if (this.events.length < originalLength) {
+      console.log(`Removed ${originalLength - this.events.length} past completed events`);
+      this.saveEvents();
+    }
   }
   
   loadEvents() {
@@ -184,7 +230,15 @@ export class EventManager {
     // Days of Notice input with info tooltip
     const noticeGroup = document.createElement('div');
     noticeGroup.className = 'form-group';
-    
+    noticeGroup.classList.add('notice-group');
+    const detailsRow = document.createElement('div');
+    detailsRow.className = 'form-row';
+
+    // Add all three groups to the row
+    detailsRow.appendChild(typeGroup);
+    detailsRow.appendChild(dateGroup);
+    detailsRow.appendChild(noticeGroup);
+
     const noticeLabel = document.createElement('label');
     noticeLabel.textContent = 'Days of Notice';
     noticeLabel.setAttribute('for', 'event-notice-days');
@@ -269,9 +323,7 @@ export class EventManager {
     
     // Build the form
     modalForm.appendChild(nameGroup);
-    modalForm.appendChild(typeGroup);
-    modalForm.appendChild(dateGroup);
-    modalForm.appendChild(noticeGroup);
+    modalForm.appendChild(detailsRow);
     modalForm.appendChild(descGroup);
     modalForm.appendChild(modalActions);
     
@@ -306,7 +358,7 @@ export class EventManager {
   openModal(editEventId = null, callback = null) {
     // Store the callback
     this.modalCallback = callback;
-
+    
     // Reset form
     document.getElementById('event-form').reset();
     
@@ -349,7 +401,7 @@ export class EventManager {
     
     this.modalOverlay.classList.add('active');
     this.eventTitleInput.focus();
-
+    
     this.deleteEventButton.addEventListener('click', () => this.deleteSelectedEvent(this.modalCallback));
     // Update the form submission
     const modalForm = document.getElementById('event-form');
@@ -364,7 +416,7 @@ export class EventManager {
     this.selectedEvent = null;
   }
   
-  submitEventForm() {
+  submitEventForm(callback) {
     const title = this.eventTitleInput.value.trim();
     const type = this.eventTypeSelect.value;
     
@@ -380,6 +432,26 @@ export class EventManager {
     const description = this.eventDescInput.value.trim();
     
     if (title && type && !isNaN(dueDate.getTime())) {
+      // Add duplicate check only for new events (not when editing)
+      if (!this.selectedEvent) {
+        // Check for duplicate events with same title on same date
+        const hasDuplicate = this.events.some(event => {
+          const eventDate = new Date(event.dueDate);
+          return (
+            eventDate.getFullYear() === dueDate.getFullYear() &&
+            eventDate.getMonth() === dueDate.getMonth() &&
+            eventDate.getDate() === dueDate.getDate() &&
+            event.title === title
+          );
+        });
+        
+        if (hasDuplicate) {
+          console.log('Duplicate event detected - not adding');
+          this.closeModal();
+          return; // Don't proceed with adding
+        }
+      }
+      
       if (this.selectedEvent) {
         // Update existing event
         this.selectedEvent.title = title;
@@ -406,7 +478,9 @@ export class EventManager {
       this.saveEvents();
       this.closeModal();
       this.render();
-
+      this.checklistManager.render();
+      this.calendarManager.render();
+  
       // Call the callback if provided
       if (typeof callback === 'function') {
         callback();
@@ -420,6 +494,8 @@ export class EventManager {
       this.saveEvents();
       this.closeModal();
       this.render();
+      this.checklistManager.render();
+      this.calendarManager.render();
       
       // Call the callback if provided
       if (typeof callback === 'function') {
@@ -430,6 +506,24 @@ export class EventManager {
   
   getEventTypeInfo(typeId) {
     return this.eventTypes.find(type => type.id === typeId) || this.eventTypes[6]; // Default to 'Other'
+  }
+  cleanupPastEvents() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const originalLength = this.events.length;
+    
+    this.events = this.events.filter(event => {
+      const eventDate = new Date(event.dueDate);
+      eventDate.setHours(0, 0, 0, 0);
+      
+      return eventDate >= today || !event.completed;
+    });
+    
+    if (this.events.length < originalLength) {
+      console.log(`Removed ${originalLength - this.events.length} past completed events`);
+      this.saveEvents();
+    }
   }
   
   toggleEventCompletion(id) {

@@ -320,3 +320,45 @@
   #event-notice-days{
     width: 10%;
   }
+
+  .form-row {
+    display: flex;
+    flex-direction: row;
+    gap: 45px;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+
+  .form-row input, 
+.form-row select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Specifically for the notice days input */
+#event-notice-days {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 80px;
+}
+
+/* For the container of the notice input and info icon */
+.notice-input-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#event-type{
+  width: 100%;
+}
+
+#event-date {
+  width: 100%;
+}
