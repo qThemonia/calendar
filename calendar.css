@@ -187,3 +187,14 @@
 .day-ring.has-events.selected-day {
   box-shadow: 0 0 0 2px rgb(168, 100, 35);
 }
+
+/* Calendar event color mapping (bold versions of event colors) */
+:root {
+  --calendar-red: #ff8080;
+  --calendar-pink: #ff8dff;
+  --calendar-purple: #806dff;
+  --calendar-blue: #6ea8ff;
+  --calendar-green: #528d52;
+  --calendar-yellow: #9f9f00;
+  --calendar-orange: #feb770;
+}

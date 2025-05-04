@@ -40,7 +40,8 @@ html,body{
     max-height: max-content;
 }
 
-#calendar-container{
+/* Updated to target calendar wrapper instead of calendar container directly */
+#calendar-wrapper{
     background-color: rgb(255, 235, 218);
     grid-row: 2;
     margin: 15px;
@@ -48,6 +49,23 @@ html,body{
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(168, 100, 35, 0.2);
     max-height: max-content;
+    display: flex;
+    flex-direction: column;
+}
+
+#calendar-container{
+    flex: 1;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+    background-color: transparent;
+}
+
+#history-button-container {
+    padding: 0 20px 20px;
+    margin-top: 10px;
 }
 
 #event-container{

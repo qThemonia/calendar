@@ -1,4 +1,4 @@
-// Updated renderer.js with correct initialization
+// Updated renderer.js with event history support
 import { passQuotes } from './quotes.js';
 import { ChecklistManager } from './checklist.js';
 import { CalendarManager } from './calendar.js';

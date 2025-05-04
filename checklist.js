@@ -7,6 +7,8 @@ export class ChecklistManager {
     this.selectedColor = 'orange'; // Default color
     this.loadItems();
     this.createModal();
+    this.checkForNewDay();
+    this.setupDailyReset();
     this.render();
   }
 
@@ -17,6 +19,50 @@ export class ChecklistManager {
     if (savedItems) {
       this.items = JSON.parse(savedItems);
     }
+  }
+  checkForNewDay() {
+    // Get today's date and remove time component
+    const today = new Date();
+    const todayString = today.toDateString();
+    
+    // Get the last reset date from localStorage
+    const lastResetDate = localStorage.getItem('checklist-last-reset');
+    
+    // If no reset date exists or it's different from today, reset completed items
+    if (!lastResetDate || lastResetDate !== todayString) {
+      console.log('New day detected. Resetting completed checklist items.');
+      
+      // Reset all completed items to uncompleted
+      this.items.forEach(item => {
+        if (item.completed) {
+          item.completed = false;
+        }
+      });
+      
+      // Save the updated items
+      this.saveItems();
+      
+      // Store today as the last reset date
+      localStorage.setItem('checklist-last-reset', todayString);
+    }
+  }
+  
+  // Add the daily check functionality to setupDailyReset method
+  setupDailyReset() {
+    // Calculate time until next midnight
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeUntilMidnight = tomorrow - now;
+    
+    // Set a timeout to run at midnight
+    setTimeout(() => {
+      this.checkForNewDay();
+      // Set up daily interval (24 hours) for checking
+      setInterval(() => this.checkForNewDay(), 24 * 60 * 60 * 1000);
+    }, timeUntilMidnight);
   }
 
   saveItems() {
