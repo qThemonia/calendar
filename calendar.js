@@ -20,6 +20,24 @@ export class CalendarManager {
     setEventManager(eventManager) {
       this.eventManager = eventManager;
       this.render(); // Re-render to show event indicators
+      this.createHistoryButton();
+    }
+    createHistoryButton() {
+      this.historyButtonContainer = document.getElementById('history-button-container');
+      // Clear the container first
+      this.historyButtonContainer.innerHTML = '';
+      
+      // Create the history button
+      const historyButton = document.createElement('button');
+      historyButton.className = 'history-button';
+      historyButton.textContent = 'View Event History';
+      historyButton.addEventListener('click', () => {
+        if (this.eventManager) {
+          this.eventManager.showEventHistory();
+        }
+      });
+      
+      this.historyButtonContainer.appendChild(historyButton);
     }
     setupEventListeners() {
       // Find buttons by class within our specific container
@@ -175,20 +193,17 @@ export class CalendarManager {
     }
 
     getCalendarColor(eventTypeColor) {
-      // Create a mapping of event colors to calendar colors
-      // This can be customized to create any color mapping you want
+      // Map event colors to calendar colors using CSS variables
       const colorMap = {
-        // Map original event colors to bolder calendar colors
-        '#ff8a8a': '#ff2d2d', // Light red to bold red
-        '#ff9dff': '#e600e6', // Light pink to bold pink/magenta
-        '#a18dff': '#5a3fff', // Light purple to bold purple
-        '#7ba6ff': '#0066ff', // Light blue to bold blue
-        '#96ff96': '#00cc00', // Light green to bold green
-        '#fdff8f': '#e6e600', // Light yellow to bold yellow
-        '#ffb663': '#ff8000'  // Light orange to bold orange
+        'var(--event-type-appointment)': 'var(--calendar-red)',
+        'var(--event-type-deadline)': 'var(--calendar-pink)',
+        'var(--event-type-meeting)': 'var(--calendar-purple)',
+        'var(--event-type-personal)': 'var(--calendar-blue)',
+        'var(--event-type-task)': 'var(--calendar-green)',
+        'var(--event-type-reminder)': 'var(--calendar-yellow)',
+        'var(--event-type-other)': 'var(--calendar-orange)'
       };
       
-      // Return the mapped color or the original color if no mapping exists
       return colorMap[eventTypeColor] || eventTypeColor;
     }
 
@@ -352,6 +367,10 @@ export class CalendarManager {
       
       this.container.appendChild(calendarGrid);
       
+      if (this.eventManager) {
+        this.createHistoryButton();
+      }
+
       // Call setupEventListeners at the end of render
       this.setupEventListeners();
     }

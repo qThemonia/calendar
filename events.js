@@ -5,15 +5,16 @@ export class EventManager {
     this.calendarManager = calendarManager;
     this.checklistManager = null;
     this.events = [];
+    this.eventHistory = [];
     this.selectedEvent = null;
     this.eventTypes = [
-      { id: 'appointment', name: 'Appointment', color: '#ff8a8a' },
-      { id: 'deadline', name: 'Deadline', color: '#ff9dff' },
-      { id: 'meeting', name: 'Meeting', color: '#a18dff' },
-      { id: 'personal', name: 'Personal', color: '#7ba6ff' },
-      { id: 'task', name: 'Task', color: '#96ff96' },
-      { id: 'reminder', name: 'Reminder', color: '#fdff8f' },
-      { id: 'other', name: 'Other', color: '#ffb663' }
+      { id: 'appointment', name: 'Appointment', color: 'var(--event-type-appointment)' },
+      { id: 'deadline', name: 'Deadline', color: 'var(--event-type-deadline)' },
+      { id: 'meeting', name: 'Meeting', color: 'var(--event-type-meeting)' },
+      { id: 'personal', name: 'Personal', color: 'var(--event-type-personal)' },
+      { id: 'task', name: 'Task', color: 'var(--event-type-task)' },
+      { id: 'reminder', name: 'Reminder', color: 'var(--event-type-reminder)' },
+      { id: 'other', name: 'Other', color: 'var(--event-type-other)' }
     ];
     
     // Bind methods
@@ -24,11 +25,16 @@ export class EventManager {
     this.getUpcomingEvents = this.getUpcomingEvents.bind(this);
     this.getPreparationEvents = this.getPreparationEvents.bind(this);
     this.cleanupPastEvents = this.cleanupPastEvents.bind(this);
+    this.saveEventHistory = this.saveEventHistory.bind(this);
+    this.loadEventHistory = this.loadEventHistory.bind(this);
+    this.showEventHistory = this.showEventHistory.bind(this);
     
     // Initialize
     this.loadEvents();
+    this.loadEventHistory();
     this.cleanupPastEvents();
     this.createEventModal();
+    this.createHistoryModal();
     
     // Subscribe to calendar selection changes
     if (this.calendarManager) {
@@ -88,17 +94,36 @@ export class EventManager {
     today.setHours(0, 0, 0, 0);
     
     const originalLength = this.events.length;
+    const expiredEvents = [];
     
+    // Filter out expired events
     this.events = this.events.filter(event => {
       const eventDate = new Date(event.dueDate);
       eventDate.setHours(0, 0, 0, 0);
       
-      // Keep events that are today or in the future, OR not completed
-      return eventDate >= today || !event.completed;
+      // Keep events that are today or in the future
+      const shouldKeep = eventDate >= today;
+      
+      // If the event is in the past, add it to expired events
+      if (!shouldKeep) {
+        expiredEvents.push({
+          ...event,
+          expiredAt: new Date().toISOString() // Add timestamp when it was moved to history
+        });
+      }
+      
+      return shouldKeep;
     });
     
+    // Add expired events to history
+    if (expiredEvents.length > 0) {
+      this.eventHistory = [...expiredEvents, ...this.eventHistory];
+      this.saveEventHistory();
+      console.log(`Moved ${expiredEvents.length} expired events to history`);
+    }
+    
     if (this.events.length < originalLength) {
-      console.log(`Removed ${originalLength - this.events.length} past completed events`);
+      console.log(`Removed ${originalLength - this.events.length} past events`);
       this.saveEvents();
     }
   }
@@ -122,6 +147,33 @@ export class EventManager {
   
   saveEvents() {
     localStorage.setItem('event-items', JSON.stringify(this.events));
+  }
+
+  loadEventHistory() {
+    const savedHistory = localStorage.getItem('event-history');
+    if (savedHistory) {
+      try {
+        this.eventHistory = JSON.parse(savedHistory);
+        
+        // Convert string dates back to Date objects
+        this.eventHistory.forEach(event => {
+          event.dueDate = new Date(event.dueDate);
+          if (event.expiredAt) {
+            event.expiredAt = new Date(event.expiredAt);
+          }
+        });
+      } catch (e) {
+        console.error('Error loading event history', e);
+        this.eventHistory = [];
+      }
+    }
+  }
+  
+  // New method to save event history
+  saveEventHistory() {
+    // Limit history to 100 most recent events to prevent localStorage from growing too large
+    const limitedHistory = this.eventHistory.slice(0, 100);
+    localStorage.setItem('event-history', JSON.stringify(limitedHistory));
   }
   
   createEventModal() {
@@ -347,7 +399,174 @@ export class EventManager {
       }
     });
   }
+  // Create event history modal
+createHistoryModal() {
+  // Create modal overlay
+  this.historyModalOverlay = document.createElement('div');
+  this.historyModalOverlay.className = 'modal-overlay';
+  document.body.appendChild(this.historyModalOverlay);
   
+  // Create modal content
+  const historyModal = document.createElement('div');
+  historyModal.className = 'event-modal history-modal';
+  
+  // Modal header
+  const modalHeader = document.createElement('div');
+  modalHeader.className = 'modal-header';
+  
+  const modalTitle = document.createElement('h3');
+  modalTitle.textContent = 'Event History';
+  
+  const closeButton = document.createElement('button');
+  closeButton.className = 'modal-close';
+  closeButton.textContent = '×';
+  closeButton.addEventListener('click', () => this.closeHistoryModal());
+  
+  modalHeader.appendChild(modalTitle);
+  modalHeader.appendChild(closeButton);
+  
+  // Modal body
+  this.historyContainer = document.createElement('div');
+  this.historyContainer.className = 'history-container';
+  
+  // Build the modal
+  historyModal.appendChild(modalHeader);
+  historyModal.appendChild(this.historyContainer);
+  
+  this.historyModalOverlay.appendChild(historyModal);
+  
+  // Close modal when clicking outside
+  this.historyModalOverlay.addEventListener('click', (e) => {
+    if (e.target === this.historyModalOverlay) {
+      this.closeHistoryModal();
+    }
+  });
+  
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && this.historyModalOverlay.classList.contains('active')) {
+      this.closeHistoryModal();
+    }
+  });
+}
+
+// Show event history modal
+showEventHistory() {
+  // Clear the container
+  this.historyContainer.innerHTML = '';
+  
+  // Group events by month
+  const groupedEvents = this.groupEventsByMonth(this.eventHistory);
+  
+  // If no events, show a message
+  if (this.eventHistory.length === 0) {
+    const noEventsMsg = document.createElement('div');
+    noEventsMsg.className = 'no-events-message';
+    noEventsMsg.textContent = 'No event history available';
+    this.historyContainer.appendChild(noEventsMsg);
+  } else {
+    // Create a list for each month
+    for (const [monthKey, events] of Object.entries(groupedEvents)) {
+      const monthHeader = document.createElement('div');
+      monthHeader.className = 'history-month-header';
+      monthHeader.textContent = monthKey;
+      this.historyContainer.appendChild(monthHeader);
+      
+      const eventsList = document.createElement('div');
+      eventsList.className = 'history-events-list';
+      
+      events.forEach(event => {
+        const eventItem = this.createHistoryEventItem(event);
+        eventsList.appendChild(eventItem);
+      });
+      
+      this.historyContainer.appendChild(eventsList);
+    }
+  }
+  
+  // Show modal
+  this.historyModalOverlay.classList.add('active');
+}
+
+// Group events by month for better organization
+groupEventsByMonth(events) {
+  const grouped = {};
+  
+  events.forEach(event => {
+    const date = new Date(event.dueDate);
+    const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    if (!grouped[monthYear]) {
+      grouped[monthYear] = [];
+    }
+    
+    grouped[monthYear].push(event);
+  });
+  
+  // Sort events within each month by date
+  for (const month in grouped) {
+    grouped[month].sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
+  }
+  
+  return grouped;
+}
+
+// Create an event item for the history list
+createHistoryEventItem(event) {
+  const eventItem = document.createElement('div');
+  eventItem.className = 'history-event-item';
+  
+  // Get event type info for color and name
+  const typeInfo = this.getEventTypeInfo(event.type);
+  
+  // Set the event type color
+  eventItem.style.borderLeftColor = typeInfo.color;
+  
+  // Create event content wrapper
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'history-event-content';
+  
+  // Event title
+  const title = document.createElement('div');
+  title.className = 'history-event-title';
+  title.textContent = event.title;
+  
+  // Event details
+  const details = document.createElement('div');
+  details.className = 'history-event-details';
+  
+  const typeSpan = document.createElement('span');
+  typeSpan.className = 'event-type';
+  typeSpan.textContent = typeInfo.name;
+  typeSpan.style.backgroundColor = typeInfo.color;
+  
+  const dateInfo = document.createElement('span');
+  dateInfo.className = 'history-event-date';
+  dateInfo.textContent = this.formatDate(event.dueDate);
+  
+  // Completion status
+  const statusSpan = document.createElement('span');
+  statusSpan.className = `history-event-status ${event.completed ? 'completed' : 'missed'}`;
+  statusSpan.textContent = event.completed ? 'Completed' : 'Missed';
+  
+  details.appendChild(typeSpan);
+  details.appendChild(dateInfo);
+  details.appendChild(statusSpan);
+  
+  contentDiv.appendChild(title);
+  contentDiv.appendChild(details);
+  
+  // Add elements to event item
+  eventItem.appendChild(contentDiv);
+  
+  return eventItem;
+}
+
+// Close history modal
+closeHistoryModal() {
+  this.historyModalOverlay.classList.remove('active');
+}
+
   formatDateForInput(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

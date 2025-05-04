@@ -362,3 +362,14 @@
 #event-date {
   width: 100%;
 }
+
+/* Event type colors */
+:root {
+  --event-type-appointment: #ff8080;
+  --event-type-deadline: #ff8dff;
+  --event-type-meeting: #806dff;
+  --event-type-personal: #6ea8ff;
+  --event-type-task: #528d52;
+  --event-type-reminder: #9f9f00;
+  --event-type-other: #feb770;
+}
