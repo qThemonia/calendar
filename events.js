@@ -817,7 +817,147 @@ closeHistoryModal() {
     if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`;
     return `In ${diffDays} days`;
   }
+  // Add this method to your EventManager class in events.js
+rescheduleEvent(eventId, newDate) {
+  const event = this.events.find(event => event.id === eventId);
+  if (event) {
+    // Store the old date for a potential notification
+    const oldDate = new Date(event.dueDate);
+    
+    // Update the event's date to the new date
+    event.dueDate = newDate;
+    
+    // Save changes
+    this.saveEvents();
+    
+    // Refresh all UI components
+    this.render();
+    if (this.checklistManager) this.checklistManager.render();
+    if (this.calendarManager) this.calendarManager.render();
+    
+    // Return success message with date info
+    return {
+      success: true,
+      event: event.title,
+      oldDate: oldDate.toLocaleDateString(),
+      newDate: newDate.toLocaleDateString()
+    };
+  }
   
+  return { success: false };
+}
+createEventItem(event, isPrepEvent = false) {
+  const eventItem = document.createElement('div');
+  eventItem.className = `event-item ${event.completed ? 'completed' : ''}`;
+  eventItem.dataset.id = event.id;
+  eventItem.setAttribute('draggable', true);
+
+  // Add drag event listeners
+  eventItem.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', event.id);
+    eventItem.classList.add('dragging');
+    
+    // Create a custom drag image if needed
+    // const dragIcon = document.createElement('div');
+    // dragIcon.textContent = event.title;
+    // dragIcon.className = 'drag-icon';
+    // document.body.appendChild(dragIcon);
+    // e.dataTransfer.setDragImage(dragIcon, 0, 0);
+  });
+  
+  eventItem.addEventListener('dragend', () => {
+    eventItem.classList.remove('dragging');
+  });
+
+  // Get event type info for color and name
+  const typeInfo = this.getEventTypeInfo(event.type);
+  
+  // Set the event type color
+  eventItem.style.borderLeftColor = typeInfo.color;
+  
+  // Create event content wrapper
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'event-content';
+  
+  // Event title
+  const title = document.createElement('div');
+  title.className = 'event-title';
+  title.textContent = event.title;
+  
+  // Event details
+  const details = document.createElement('div');
+  details.className = 'event-details';
+  
+  const typeSpan = document.createElement('span');
+  typeSpan.className = 'event-type';
+  typeSpan.textContent = typeInfo.name;
+  typeSpan.style.backgroundColor = typeInfo.color;
+  
+  const dateInfo = document.createElement('span');
+  dateInfo.className = 'event-date-info';
+  
+  if (isPrepEvent) {
+    // For prep events, show the due date and days until due
+    dateInfo.textContent = `Due: ${this.formatDate(event.dueDate)} (${this.getDaysUntil(event.dueDate)})`;
+  } else {
+    dateInfo.textContent = this.formatDate(event.dueDate);
+  }
+  
+  details.appendChild(typeSpan);
+  details.appendChild(dateInfo);
+  
+  // Add description if available
+  if (event.description) {
+    const desc = document.createElement('div');
+    desc.className = 'event-description';
+    desc.textContent = event.description;
+    contentDiv.appendChild(title);
+    contentDiv.appendChild(details);
+    contentDiv.appendChild(desc);
+  } else {
+    contentDiv.appendChild(title);
+    contentDiv.appendChild(details);
+  }
+  
+  // Create action buttons
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'event-actions';
+  
+  // Complete/uncomplete button
+  const completeButton = document.createElement('button');
+  completeButton.className = 'event-action-btn complete-btn';
+  completeButton.innerHTML = event.completed ? '↩' : '✓';
+  completeButton.title = event.completed ? 'Mark as incomplete' : 'Mark as complete';
+  completeButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    this.toggleEventCompletion(event.id);
+  });
+  
+  // Edit button
+  const editButton = document.createElement('button');
+  editButton.className = 'event-action-btn edit-btn';
+  editButton.innerHTML = '✎';
+  editButton.title = 'Edit event';
+  editButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    this.openModal(event.id);
+  });
+  
+  actionsDiv.appendChild(completeButton);
+  actionsDiv.appendChild(editButton);
+  
+  // Add elements to event item
+  eventItem.appendChild(contentDiv);
+  eventItem.appendChild(actionsDiv);
+  
+  // Add click event to toggle completion
+  eventItem.addEventListener('click', () => {
+    this.openModal(event.id);
+  });
+  
+  return eventItem;
+}
+
   render() {
     // Clear container
     this.container.innerHTML = '';
@@ -876,97 +1016,5 @@ closeHistoryModal() {
     }
   }
   
-  createEventItem(event, isPrepEvent = false) {
-    const eventItem = document.createElement('div');
-    eventItem.className = `event-item ${event.completed ? 'completed' : ''}`;
-    eventItem.dataset.id = event.id;
-    
-    // Get event type info for color and name
-    const typeInfo = this.getEventTypeInfo(event.type);
-    
-    // Set the event type color
-    eventItem.style.borderLeftColor = typeInfo.color;
-    
-    // Create event content wrapper
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'event-content';
-    
-    // Event title
-    const title = document.createElement('div');
-    title.className = 'event-title';
-    title.textContent = event.title;
-    
-    // Event details
-    const details = document.createElement('div');
-    details.className = 'event-details';
-    
-    const typeSpan = document.createElement('span');
-    typeSpan.className = 'event-type';
-    typeSpan.textContent = typeInfo.name;
-    typeSpan.style.backgroundColor = typeInfo.color;
-    
-    const dateInfo = document.createElement('span');
-    dateInfo.className = 'event-date-info';
-    
-    if (isPrepEvent) {
-      // For prep events, show the due date and days until due
-      dateInfo.textContent = `Due: ${this.formatDate(event.dueDate)} (${this.getDaysUntil(event.dueDate)})`;
-    } else {
-      dateInfo.textContent = this.formatDate(event.dueDate);
-    }
-    
-    details.appendChild(typeSpan);
-    details.appendChild(dateInfo);
-    
-    // Add description if available
-    if (event.description) {
-      const desc = document.createElement('div');
-      desc.className = 'event-description';
-      desc.textContent = event.description;
-      contentDiv.appendChild(title);
-      contentDiv.appendChild(details);
-      contentDiv.appendChild(desc);
-    } else {
-      contentDiv.appendChild(title);
-      contentDiv.appendChild(details);
-    }
-    
-    // Create action buttons
-    const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'event-actions';
-    
-    // Complete/uncomplete button
-    const completeButton = document.createElement('button');
-    completeButton.className = 'event-action-btn complete-btn';
-    completeButton.innerHTML = event.completed ? '↩' : '✓';
-    completeButton.title = event.completed ? 'Mark as incomplete' : 'Mark as complete';
-    completeButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleEventCompletion(event.id);
-    });
-    
-    // Edit button
-    const editButton = document.createElement('button');
-    editButton.className = 'event-action-btn edit-btn';
-    editButton.innerHTML = '✎';
-    editButton.title = 'Edit event';
-    editButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.openModal(event.id);
-    });
-    
-    actionsDiv.appendChild(completeButton);
-    actionsDiv.appendChild(editButton);
-    
-    // Add elements to event item
-    eventItem.appendChild(contentDiv);
-    eventItem.appendChild(actionsDiv);
-    
-    // Add click event to toggle completion
-    eventItem.addEventListener('click', () => {
-      this.openModal(event.id);
-    });
-    
-    return eventItem;
-  }
+  
 }

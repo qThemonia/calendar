@@ -206,6 +206,67 @@ export class CalendarManager {
       
       return colorMap[eventTypeColor] || eventTypeColor;
     }
+    // Helper method to add drag & drop event listeners to a day element
+addDragDropListeners(dayElem) {
+  // Only add listeners if we have an event manager
+  if (!this.eventManager) return;
+  
+  dayElem.addEventListener('dragover', (e) => {
+    // Allow the drop
+    e.preventDefault();
+    dayElem.classList.add('drag-over');
+  });
+  
+  dayElem.addEventListener('dragleave', () => {
+    dayElem.classList.remove('drag-over');
+  });
+  
+  dayElem.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dayElem.classList.remove('drag-over');
+    
+    // Get the event ID from the dragged element
+    const eventId = e.dataTransfer.getData('text/plain');
+    if (!eventId) return;
+    
+    // Get the target date from the day element
+    const targetDate = new Date(dayElem.dataset.date);
+    
+    // Reschedule the event
+    const result = this.eventManager.rescheduleEvent(eventId, targetDate);
+    
+    // Show a notification if successful
+    if (result && result.success) {
+      this.showRescheduleNotification(result);
+    }
+  });
+}
+
+// Helper method to show a notification when an event is rescheduled
+showRescheduleNotification(result) {
+  // Create notification element if it doesn't exist
+  let notification = document.querySelector('.reschedule-notification');
+  if (!notification) {
+    notification = document.createElement('div');
+    notification.className = 'reschedule-notification';
+    document.body.appendChild(notification);
+  }
+  
+  // Update notification content
+  notification.textContent = `"${result.event}" moved from ${result.oldDate} to ${result.newDate}`;
+  notification.classList.remove('fade-out');
+  
+  // Remove after a delay
+  clearTimeout(this.notificationTimeout);
+  this.notificationTimeout = setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 500); // Match fade-out transition time
+  }, 3000);
+}
 
     render() {
       // Clear container
@@ -267,6 +328,17 @@ export class CalendarManager {
         
         const prevMonthDay = prevMonthDays - firstDayOfMonth + i + 1;
         
+        // Set the date data attribute for drag & drop
+        const prevMonthDate = new Date(
+          this.currentMonth === 0 ? this.currentYear - 1 : this.currentYear,
+          this.currentMonth === 0 ? 11 : this.currentMonth - 1,
+          prevMonthDay
+        );
+        dayElem.dataset.date = prevMonthDate.toISOString();
+        
+        // Add drag and drop event listeners for previous month days
+        this.addDragDropListeners(dayElem);
+        
         const dayNumber = document.createElement('span');
         dayNumber.textContent = prevMonthDay;
         dayElem.appendChild(dayNumber);
@@ -284,6 +356,13 @@ export class CalendarManager {
         const dayElem = document.createElement('div');
         dayElem.className = 'day-ring';
         
+        // Set the date data attribute for drag & drop
+        const currentDate = new Date(this.currentYear, this.currentMonth, day);
+        dayElem.dataset.date = currentDate.toISOString();
+        
+        // Add drag and drop event listeners
+        this.addDragDropListeners(dayElem);
+        
         if (this.isCurrentDay(day)) {
           dayElem.classList.add('current-day');
         }
@@ -298,7 +377,7 @@ export class CalendarManager {
       
         if (events.length > 0) {
           const eventTypes = events.map(event => event.type);
-
+    
           // Apply the appropriate coloring based on number of unique event types
           if (eventTypes.length === 1) {
             const eventType = this.eventManager.getEventTypeInfo(eventTypes[0]);
@@ -353,6 +432,17 @@ export class CalendarManager {
         const dayElem = document.createElement('div');
         dayElem.className = 'day-ring next-month';
         
+        // Set the date data attribute for drag & drop
+        const nextMonthDate = new Date(
+          this.currentMonth === 11 ? this.currentYear + 1 : this.currentYear,
+          this.currentMonth === 11 ? 0 : this.currentMonth + 1,
+          day
+        );
+        dayElem.dataset.date = nextMonthDate.toISOString();
+        
+        // Add drag and drop event listeners for next month days
+        this.addDragDropListeners(dayElem);
+        
         const dayNumber = document.createElement('span');
         dayNumber.textContent = day;
         dayElem.appendChild(dayNumber);
@@ -370,7 +460,7 @@ export class CalendarManager {
       if (this.eventManager) {
         this.createHistoryButton();
       }
-
+    
       // Call setupEventListeners at the end of render
       this.setupEventListeners();
     }

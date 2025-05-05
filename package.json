@@ -36,6 +36,7 @@
     "electron-reload-esm": "^1.0.1"
   },
   "dependencies": {
+    "chart.js": "^4.4.9",
     "velopack": "^0.0.1213-g57cf68d"
   }
 }

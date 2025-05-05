@@ -4,6 +4,7 @@ import { ChecklistManager } from './checklist.js';
 import { CalendarManager } from './calendar.js';
 import { EventManager } from './events.js';
 
+
 async function updateApp() {
     // Check for new version
     const updateInfo = await window.velopackApi.checkForUpdates();
@@ -21,6 +22,25 @@ async function updateApp() {
 function selectQuote(){
   let quoteString = passQuotes();
   document.getElementById("displayed-quote").innerHTML = quoteString;
+}
+function initDragAndDrop() {
+  // This will be called after components are initialized
+  // It simply ensures that any existing events become draggable
+  
+  document.querySelectorAll('.event-item').forEach(event => {
+    if (!event.hasAttribute('draggable')) {
+      event.setAttribute('draggable', true);
+      
+      event.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', event.dataset.id);
+        event.classList.add('dragging');
+      });
+      
+      event.addEventListener('dragend', () => {
+        event.classList.remove('dragging');
+      });
+    }
+  });
 }
 
 // Initialize components
@@ -42,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Connect event manager to checklist for updates
   eventManager.checklistManager = checklistManager;
-  
+  setTimeout(initDragAndDrop, 1000);
+
   // Check for updates
   // Uncomment when ready to use auto-updates
   // updateApp().catch(console.error);
