@@ -23,7 +23,7 @@ export class CompletionHistoryManager {
       this.recordTodaysStats();
     }
     
-    // Modified version of recordTodaysStats that preserves deleted tasks in history
+// Modified version of recordTodaysStats that preserves deleted tasks in history
 recordTodaysStats() {
     try {
       // Get today's date and remove time component
@@ -37,10 +37,6 @@ recordTodaysStats() {
       
       // Get all tasks and completion status
       const currentTasks = this.checklistManager.items;
-      const totalCurrentTasks = currentTasks.length;
-      const completedCurrentTasks = currentTasks.filter(task => task.completed).length;
-      
-      // Current tasks IDs for reference
       const currentTaskIds = currentTasks.map(task => task.id);
       
       // Create task stats for today's entry, including preserving deleted tasks
@@ -50,19 +46,23 @@ recordTodaysStats() {
         // Get existing tasks from today's entry
         const existingTaskStats = todayEntry.taskStats || [];
         
-        // Filter out tasks that are now in the current list (we'll add updated versions)
-        const retainedTasks = existingTaskStats.filter(task => 
+        // Identify tasks that exist in history but are no longer in current list
+        const deletedTasks = existingTaskStats.filter(task => 
           !currentTaskIds.includes(task.id) && !task.isDeleted
         );
         
-        // Mark any tasks that were in history but not in current list as deleted
-        retainedTasks.forEach(task => {
-          if (!currentTaskIds.includes(task.id)) {
-            task.isDeleted = true;
-          }
+        // Mark these tasks as deleted
+        deletedTasks.forEach(task => {
+          task.isDeleted = true;
         });
         
-        // Add current tasks
+        // Keep all tasks from history (both deleted and non-deleted)
+        // that aren't in the current list
+        const retainedTasks = existingTaskStats.filter(task => 
+          !currentTaskIds.includes(task.id)
+        );
+        
+        // Add current tasks with updated completion status
         const currentTaskStats = currentTasks.map(task => {
           // Calculate days this task has been listed
           const createdDate = new Date(task.createdAt || today);
@@ -320,7 +320,38 @@ recordTodaysStats() {
       // Update task list
       this.updateTaskList(filteredData);
     }
-    
+    recordTaskDeletion(taskId) {
+        // Get today's entry
+        const today = new Date();
+        const todayString = today.toDateString();
+        
+        let todayEntry = this.historyData.find(entry => 
+          new Date(entry.date).toDateString() === todayString
+        );
+        
+        if (todayEntry) {
+          // Find the task in today's stats
+          const taskStat = todayEntry.taskStats.find(task => task.id === taskId);
+          
+          if (taskStat) {
+            // Mark as deleted but keep it in the history
+            taskStat.isDeleted = true;
+            
+            // Recalculate completion rate
+            const completedTasks = todayEntry.taskStats.filter(task => task.completed).length;
+            todayEntry.completedTasks = completedTasks;
+            todayEntry.completionRate = todayEntry.taskStats.length > 0 
+              ? Math.round((completedTasks / todayEntry.taskStats.length) * 100) 
+              : 0;
+            
+            // Save the updated data
+            this.saveHistoryData();
+          }
+        }
+        
+        // Ensure today's stats are recorded
+        this.recordTodaysStats();
+      }
     getFilteredData() {
       const now = new Date();
       let cutoffDate;
@@ -744,48 +775,55 @@ updateStatsTiles(filteredData) {
     }
     
     calculateTaskStats(filteredData) {
-      // Create object to track tasks
-      const taskMap = {};
-      
-      // Process all entries in filteredData
-      filteredData.forEach(entry => {
-        entry.taskStats.forEach(task => {
-          if (!taskMap[task.id]) {
-            taskMap[task.id] = {
-              id: task.id,
-              text: task.text,
-              daysListed: 0,
-              daysCompleted: 0,
-              firstSeen: new Date(entry.date),
-              lastSeen: new Date(entry.date)
-            };
-          }
-          
-          taskMap[task.id].daysListed++;
-          
-          if (task.completed) {
-            taskMap[task.id].daysCompleted++;
-          }
-          
-          // Update lastSeen date
-          const entryDate = new Date(entry.date);
-          if (entryDate > taskMap[task.id].lastSeen) {
-            taskMap[task.id].lastSeen = entryDate;
-          }
+        // Create object to track tasks
+        const taskMap = {};
+        
+        // Process all entries in filteredData
+        filteredData.forEach(entry => {
+          // Include all tasks, even deleted ones
+          entry.taskStats.forEach(task => {
+            if (!taskMap[task.id]) {
+              taskMap[task.id] = {
+                id: task.id,
+                text: task.text,
+                daysListed: 0,
+                daysCompleted: 0,
+                isDeleted: task.isDeleted || false,
+                firstSeen: new Date(entry.date),
+                lastSeen: new Date(entry.date)
+              };
+            }
+            
+            taskMap[task.id].daysListed++;
+            
+            if (task.completed) {
+              taskMap[task.id].daysCompleted++;
+            }
+            
+            // Update deleted status (if it was ever deleted, mark it as deleted)
+            if (task.isDeleted) {
+              taskMap[task.id].isDeleted = true;
+            }
+            
+            // Update lastSeen date
+            const entryDate = new Date(entry.date);
+            if (entryDate > taskMap[task.id].lastSeen) {
+              taskMap[task.id].lastSeen = entryDate;
+            }
+          });
         });
-      });
-      
-      // Convert to array and calculate completion rates
-      const taskStats = Object.values(taskMap).map(task => {
-        return {
-          ...task,
-          completionRate: task.daysListed > 0 
-            ? Math.round((task.daysCompleted / task.daysListed) * 100) 
-            : 0
-        };
-      });
-      
-      // Sort by completion rate (descending)
-      return taskStats.sort((a, b) => b.completionRate - a.completionRate);
-    }
+        
+        // Convert to array and calculate completion rates
+        const taskStats = Object.values(taskMap).map(task => {
+          return {
+            ...task,
+            completionRate: task.daysListed > 0 
+              ? Math.round((task.daysCompleted / task.daysListed) * 100) 
+              : 0
+          };
+        });
+        
+        // Sort by completion rate (descending)
+        return taskStats.sort((a, b) => b.completionRate - a.completionRate);
+      }
   }

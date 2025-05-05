@@ -302,14 +302,19 @@ export class ChecklistManager {
   }
 
   deleteItem(id) {
+    // Store the task before removing it (for history)
+    const deletedTask = this.items.find(item => item.id === id);
+    
+    // Remove from items list
     this.items = this.items.filter(item => item.id !== id);
     this.saveItems();
-
-     // Update completion history
-    if (this.completionHistoryManager) {
-      this.completionHistoryManager.recordTodaysStats();
+  
+    // Update completion history
+    if (this.completionHistoryManager && deletedTask) {
+      // Make sure the completion history manager knows this task was deleted
+      this.completionHistoryManager.recordTaskDeletion(id);
     }
-
+  
     this.render();
   }
   
