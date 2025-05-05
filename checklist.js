@@ -1,3 +1,5 @@
+import { CompletionHistoryManager } from './completion-history.js';
+
 // Updated ChecklistManager class to integrate with EventManager
 export class ChecklistManager {
   constructor(containerId, eventManager = null) {
@@ -9,6 +11,10 @@ export class ChecklistManager {
     this.createModal();
     this.checkForNewDay();
     this.setupDailyReset();
+
+    this.completionHistoryManager = new CompletionHistoryManager(this);
+
+
     this.render();
   }
 
@@ -263,6 +269,12 @@ export class ChecklistManager {
     // Add new items to the beginning instead of the end
     this.items.unshift(newItem);
     this.saveItems();
+    
+    // Update completion history
+    if (this.completionHistoryManager) {
+      this.completionHistoryManager.recordTodaysStats();
+    }
+
     this.render();
   }
 
@@ -279,6 +291,12 @@ export class ChecklistManager {
       }
       
       this.saveItems();
+      
+      // Update completion history
+      if (this.completionHistoryManager) {
+        this.completionHistoryManager.updateTaskCompletion(id, item.completed);
+      }
+      
       this.render();
     }
   }
@@ -286,6 +304,12 @@ export class ChecklistManager {
   deleteItem(id) {
     this.items = this.items.filter(item => item.id !== id);
     this.saveItems();
+
+     // Update completion history
+    if (this.completionHistoryManager) {
+      this.completionHistoryManager.recordTodaysStats();
+    }
+
     this.render();
   }
   
@@ -498,6 +522,19 @@ export class ChecklistManager {
         
         this.container.appendChild(prepListContainer);
       }
+    }
+    if (this.completionHistoryManager) {
+      // Create button container
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'history-button-container';
+      
+      const historyButton = document.createElement('button');
+      historyButton.className = 'history-button';
+      historyButton.textContent = 'View Completion History';
+      historyButton.addEventListener('click', () => this.completionHistoryManager.showHistoryModal());
+      
+      buttonContainer.appendChild(historyButton);
+      this.container.appendChild(buttonContainer);
     }
   }
 }
