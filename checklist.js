@@ -55,20 +55,7 @@ export class ChecklistManager {
   
   // Add the daily check functionality to setupDailyReset method
   setupDailyReset() {
-    // Calculate time until next midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    const timeUntilMidnight = tomorrow - now;
-    
-    // Set a timeout to run at midnight
-    setTimeout(() => {
-      this.checkForNewDay();
-      // Set up daily interval (24 hours) for checking
-      setInterval(() => this.checkForNewDay(), 24 * 60 * 60 * 1000);
-    }, timeUntilMidnight);
+    this.checkForNewDay();
   }
 
   saveItems() {
