@@ -55,20 +55,7 @@ export class ChecklistManager {
   
   // Add the daily check functionality to setupDailyReset method
   setupDailyReset() {
-    // Calculate time until next midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    const timeUntilMidnight = tomorrow - now;
-    
-    // Set a timeout to run at midnight
-    setTimeout(() => {
-      this.checkForNewDay();
-      // Set up daily interval (24 hours) for checking
-      setInterval(() => this.checkForNewDay(), 24 * 60 * 60 * 1000);
-    }, timeUntilMidnight);
+    this.checkForNewDay();
   }
 
   saveItems() {
@@ -302,14 +289,19 @@ export class ChecklistManager {
   }
 
   deleteItem(id) {
+    // Store the task before removing it (for history)
+    const deletedTask = this.items.find(item => item.id === id);
+    
+    // Remove from items list
     this.items = this.items.filter(item => item.id !== id);
     this.saveItems();
-
-     // Update completion history
-    if (this.completionHistoryManager) {
-      this.completionHistoryManager.recordTodaysStats();
+  
+    // Update completion history
+    if (this.completionHistoryManager && deletedTask) {
+      // Make sure the completion history manager knows this task was deleted
+      this.completionHistoryManager.recordTaskDeletion(id);
     }
-
+  
     this.render();
   }
   

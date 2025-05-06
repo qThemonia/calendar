@@ -71,21 +71,6 @@ export class EventManager {
   setupDailyCleanup() {
     // Clean up past events now
     this.cleanupPastEvents();
-    
-    // Calculate time until next midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    const timeUntilMidnight = tomorrow - now;
-    
-    // Set a timeout to run at midnight, then set interval for daily
-    setTimeout(() => {
-      this.cleanupPastEvents();
-      // Set up daily interval (24 hours)
-      setInterval(this.cleanupPastEvents, 24 * 60 * 60 * 1000);
-    }, timeUntilMidnight);
   }
   
   // Add method to clean up past events
