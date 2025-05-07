@@ -3,7 +3,7 @@ import { passQuotes } from './quotes.js';
 import { ChecklistManager } from './checklist.js';
 import { CalendarManager } from './calendar.js';
 import { EventManager } from './events.js';
-
+import { initTheme } from './themes.js';
 
 async function updateApp() {
     // Check for new version
@@ -138,6 +138,10 @@ function refreshAllComponents() {
 
 // Initialize components
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Initialize the theme system
+  initTheme();
+
   // Select and display a random quote
   selectQuote();
   

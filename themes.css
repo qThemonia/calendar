@@ -1,0 +1,598 @@
+/* themes.css - Define CSS variables and theme styling */
+
+:root {
+  /* Default theme colors - will be overridden by theme.js */
+  
+  /* Main colors */
+  --primary: rgb(255, 158, 68);
+  --primary-dark: rgb(168, 100, 35);
+  --primary-darker: rgb(133, 68, 12);
+  --primary-light: rgb(255, 210, 170);
+  --primary-lighter: rgb(255, 235, 218);
+  --primary-lightest: rgb(255, 245, 235);
+  
+  /* App background */
+  --app-background: rgb(173, 214, 255);
+  
+  /* Panel colors */
+  --panel-background: rgb(248, 217, 179);
+  --panel-border: rgb(222, 184, 135);
+  
+  /* Button colors */
+  --button-background: rgb(255, 153, 51);
+  --button-text: white;
+  --button-hover: rgb(255, 128, 0);
+  --button-border: rgb(222, 184, 135);
+  
+  /* Event type colors */
+  --event-type-appointment: #ff8080;
+  --event-type-deadline: #ff8dff;
+  --event-type-meeting: #806dff;
+  --event-type-personal: #6ea8ff;
+  --event-type-task: #52ad52;
+  --event-type-reminder: #cfcf40;
+  --event-type-other: #feb770;
+  
+  /* Calendar colors */
+  --calendar-red: #ff8080;
+  --calendar-pink: #ff8dff;
+  --calendar-purple: #806dff;
+  --calendar-blue: #6ea8ff;
+  --calendar-green: #52ad52;
+  --calendar-yellow: #cfcf40;
+  --calendar-orange: #feb770;
+  
+  /* Status colors */
+  --completed: #60a040;
+  --missed: #a04040;
+  
+  /* Text colors */
+  --text-primary: rgb(133, 68, 12);
+  --text-secondary: rgb(168, 100, 35);
+  --text-light: white;
+}
+
+/* Settings button */
+.settings-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.settings-button:hover {
+  background-color: var(--button-hover);
+  transform: rotate(30deg);
+}
+
+/* Theme modal */
+.theme-modal {
+  background-color: var(--panel-background);
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90vw;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--panel-border);
+  position: relative;
+}
+
+.theme-modal .modal-header {
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--panel-border);
+  padding-bottom: 15px;
+}
+
+.theme-modal .modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.theme-option {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.theme-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.theme-option.active {
+  border-color: var(--panel-border);
+  box-shadow: 0 0 0 2px var(--primary-dark);
+}
+
+.color-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  border: 2px solid var(--panel-border);
+}
+
+.theme-name {
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+/* Apply themes to all elements */
+
+/* Base styles */
+html, body {
+  background-color: var(--app-background);
+}
+
+/* Home container */
+#home-ui-container {
+  background-color: var(--app-background);
+}
+
+/* Quote container */
+#quote-container {
+  background-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid var(--primary-dark);
+}
+
+#displayed-quote {
+  color: var(--text-light);
+}
+
+/* Buttons */
+.add-button, 
+.history-button, 
+.btn-add, 
+#event-submit-btn,
+.view-event-history,
+.view-completion-history,
+.nav-button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border-color: var(--button-border);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.add-button:hover, 
+.history-button:hover, 
+.btn-add:hover, 
+#event-submit-btn:hover,
+.view-event-history:hover,
+.view-completion-history:hover,
+.nav-button:hover {
+  background-color: var(--button-hover);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Checklist container */
+#checklist-container {
+  background-color: var(--panel-background);
+  border: 2px solid var(--panel-border);
+}
+
+.checklist-header, .event-header, .modal-header {
+  border-bottom: 2px solid var(--panel-border);
+}
+
+.checklist-header h2, 
+.event-header h2, 
+.calendar-header h2,
+.modal-header h3 {
+  color: var(--text-primary);
+}
+
+.checklist-item {
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.checklist-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.checklist-item .item-text {
+  color: var(--text-primary);
+}
+
+.checklist-item .item-note {
+  color: var(--text-secondary);
+}
+
+/* Checkbox customization */
+.checklist-item .custom-checkbox .checkbox-display {
+  border-color: var(--primary);
+  background-color: white;
+}
+
+.checklist-item .custom-checkbox input[type="checkbox"]:checked ~ .checkbox-display {
+  background-color: var(--button-background);
+}
+
+.checklist-item.completed {
+  opacity: 0.7;
+  background-color: #f5f5f5;
+}
+
+.checklist-item.completed .item-text {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+/* Event styles */
+#event-container {
+  background-color: var(--panel-background);
+  border: 2px solid var(--panel-border);
+}
+
+.event-item {
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.event-title {
+  color: var(--text-primary);
+}
+
+.event-date-info {
+  color: var(--text-secondary);
+}
+
+.event-description {
+  color: var(--text-primary);
+}
+
+.event-action-btn {
+  color: var(--text-secondary);
+}
+
+.event-action-btn:hover {
+  color: var(--primary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Calendar styles */
+#calendar-wrapper {
+  background-color: var(--panel-background);
+  border: 2px solid var(--panel-border);
+}
+
+.calendar-header {
+  border-bottom: 2px solid var(--panel-border);
+}
+
+.weekday {
+  color: var(--text-primary);
+}
+
+.day-ring {
+  background-color: white;
+}
+
+.day-ring span {
+  color: var(--text-primary);
+}
+
+.day-ring:hover {
+  border-color: var(--primary);
+}
+
+.day-ring:hover::before {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.current-day {
+  border-color: var(--primary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.current-day span {
+  color: var(--primary);
+}
+
+.selected-day {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 2px var(--primary-dark);
+}
+
+.selected-day::before {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.prev-month, .next-month {
+  opacity: 0.4;
+}
+
+/* Fix for day rings with events */
+.day-ring.has-events span {
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal styles */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.task-modal, .event-modal, .history-modal, .theme-modal, .completion-history-modal {
+  background-color: var(--panel-background);
+  border: 3px solid var(--panel-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+  color: var(--text-primary);
+}
+
+.modal-close:hover {
+  color: var(--primary);
+}
+
+.form-group label {
+  color: var(--text-primary);
+}
+
+.form-group input, 
+.form-group textarea,
+.form-group select {
+  border: 2px solid var(--panel-border);
+  background-color: white;
+  color: var(--text-primary);
+}
+
+.form-group input:focus, 
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel {
+  background-color: white;
+  color: var(--text-primary);
+  border: 1px solid var(--panel-border);
+}
+
+.btn-cancel:hover {
+  background-color: #f5f5f5;
+}
+
+/* Color options */
+.color-option {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.selected {
+  border-color: var(--primary-dark);
+  transform: scale(1.1);
+}
+
+/* Event history & completion history styles */
+.history-event-item {
+  background-color: white;
+  border-left: 5px solid var(--primary);
+}
+
+.history-event-title {
+  color: var(--text-primary);
+}
+
+.history-event-date {
+  color: var(--text-secondary);
+}
+
+.history-event-status.completed {
+  background-color: var(--completed);
+}
+
+.history-event-status.missed {
+  background-color: var(--missed);
+}
+
+.history-month-header {
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+/* Completion history chart */
+.completion-chart-container canvas {
+  background-color: white;
+  border: 1px solid var(--panel-border);
+}
+
+/* Stats tiles */
+.stats-tile {
+  background-color: white;
+  border: 1px solid var(--panel-border);
+}
+
+.tile-label {
+  color: var(--text-primary);
+}
+
+.tile-value {
+  color: var(--primary);
+}
+
+/* Task history table */
+.task-history-table {
+  border: 1px solid var(--panel-border);
+}
+
+.task-history-table th {
+  background-color: var(--button-background);
+  color: var(--button-text);
+}
+
+.task-history-table tr:hover {
+  background-color: var(--primary-lightest);
+}
+
+.rate-progress {
+  background-color: var(--button-background);
+}
+
+/* Timeframe buttons */
+.timeframe-btn {
+  background-color: white;
+  border: 2px solid var(--panel-border);
+  color: var(--text-primary);
+}
+
+.timeframe-btn:hover {
+  background-color: var(--primary-lightest);
+}
+
+.timeframe-btn.active {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border-color: var(--primary-dark);
+}
+
+/* Event types */
+.event-type {
+  color: white;
+}
+
+/* Delete button */
+.delete-button, .details-button {
+  color: var(--text-secondary);
+}
+
+.delete-button:hover, .details-button:hover {
+  color: var(--primary);
+}
+
+.btn-delete {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+  color: white;
+}
+
+/* Prep section */
+.prep-title {
+  color: var(--text-primary);
+}
+
+.prep-items .checklist-item {
+  border-color: var(--primary-dark);
+  background-color: white;
+}
+
+/* No events message */
+.no-events-message {
+  color: var(--text-secondary);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Dark theme specific overrides */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] html {
+  background-color: var(--app-background);
+}
+
+[data-theme="dark"] .checklist-item,
+[data-theme="dark"] .event-item,
+[data-theme="dark"] .day-ring,
+[data-theme="dark"] .stats-tile,
+[data-theme="dark"] .theme-option,
+[data-theme="dark"] .history-event-item {
+  background-color: var(--primary-lightest);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .checklist-item .item-text,
+[data-theme="dark"] .event-title,
+[data-theme="dark"] .day-ring span,
+[data-theme="dark"] .modal-header h3,
+[data-theme="dark"] .form-group label,
+[data-theme="dark"] .calendar-header h2,
+[data-theme="dark"] .event-header h2,
+[data-theme="dark"] .checklist-header h2,
+[data-theme="dark"] .history-month-header,
+[data-theme="dark"] .task-name-cell,
+[data-theme="dark"] .theme-name,
+[data-theme="dark"] .tile-label,
+[data-theme="dark"] .timeframe-btn:not(.active),
+[data-theme="dark"] .prep-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .form-group select {
+  background-color: var(--primary-lightest);
+  color: var(--text-primary);
+  border-color: var(--panel-border);
+}
+
+[data-theme="dark"] .completion-chart-container canvas {
+  background-color: var(--primary-lightest);
+}
+
+[data-theme="dark"] .btn-cancel {
+  background-color: var(--primary-lightest);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background-color: var(--primary-light);
+}
+
+[data-theme="dark"] .checklist-item .custom-checkbox .checkbox-display {
+  background-color: var(--primary-lightest);
+  border-color: var(--panel-border);
+}
+
+[data-theme="dark"] .task-history-table {
+  background-color: var(--primary-lightest);
+}
+
+[data-theme="dark"] .task-history-table tr:hover {
+  background-color: var(--primary-light);
+}

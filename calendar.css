@@ -1,198 +1,199 @@
 /* calendar.css */
 #calendar-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-  }
-  
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid rgb(168, 100, 35);
-  }
-  
-  .calendar-header h2 {
-    margin: 0;
-    color: rgb(133, 68, 12);
-    font-size: 1.8rem;
-    font-weight: bold;
-  }
-  
-  .nav-button {
-    background-color: rgb(255, 158, 68);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(168, 100, 35, 0.3);
-  }
-  
-  .nav-button:hover {
-    background-color: rgb(168, 100, 35);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(168, 100, 35, 0.4);
-  }
-  
-  .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .weekday {
-    text-align: center;
-    font-weight: bold;
-    color: rgb(133, 68, 12);
-    padding: 5px 0;
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    flex-grow: 0.5;
-  }
-  
- /* Update the day-ring class to position indicators properly */
-.day-ring {
-  aspect-ratio: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--panel-border);
+}
+
+.calendar-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.nav-button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: none;
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  border: 2px solid transparent;
-  background-color: transparent;
-  padding: 0;
-  margin: 0;
-  min-width: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
-  
+
+.nav-button:hover {
+  background-color: var(--button-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: bold;
+  color: var(--text-primary);
+  padding: 5px 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  flex-grow: 0.5;
+}
+
+/* Update the day-ring class to position indicators properly */
+.day-ring {
+aspect-ratio: 1;
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+transition: all 0.3s ease;
+position: relative;
+border: 2px solid transparent;
+background-color: transparent;
+padding: 0;
+margin: 0;
+min-width: 0;
+}
+
+.day-ring span {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 2;
+}
+
+.day-ring::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.day-ring:hover {
+  transform: scale(1.05);
+  border-color: var(--primary);
+}
+
+.day-ring:hover::before {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.current-day {
+  border-color: var(--primary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.current-day span {
+  color: var(--primary);
+}
+
+.selected-day {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 2px var(--primary-dark);
+}
+
+.selected-day::before {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.prev-month, .next-month {
+  opacity: 0.3;
+}
+
+.prev-month span, .next-month span {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
   .day-ring span {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: rgb(133, 68, 12);
-    position: relative;
-    z-index: 2;
+    font-size: 1rem;
   }
   
-  .day-ring::before {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    right: 3px;
-    bottom: 3px;
-    border-radius: 50%;
-    background-color: transparent;
-    transition: all 0.3s ease;
-    z-index: 1;
+  .calendar-grid {
+    gap: 8px;
   }
-  
-  .day-ring:hover {
-    transform: scale(1.05);
-    border-color: rgb(255, 158, 68);
-  }
-  
-  .day-ring:hover::before {
-    background-color: rgba(255, 158, 68, 0.2);
-  }
-  
-  .current-day {
-    border-color: rgb(255, 87, 34);
-    background-color: rgb(255, 0, 0, 0.1);
-  }
-  
-  .current-day span {
-    color: rgb(255, 87, 34);
-  }
-  
-  .selected-day {
-    border-color: rgb(168, 100, 35);
-    box-shadow: 0 0 0 2px rgb(168, 100, 35);
-  }
-  
-  .selected-day::before {
-    background-color: rgba(255, 158, 68, 0.4);
-  }
-  
-  .prev-month, .next-month {
-    opacity: 0.3;
-  }
-  
-  .prev-month span, .next-month span {
-    color: rgb(168, 100, 35);
-  }
-  
-  @media (max-width: 768px) {
-    .day-ring span {
-      font-size: 1rem;
-    }
-    
-    .calendar-grid {
-      gap: 8px;
-    }
-  }
+}
 
 .day-ring.has-events {
-  position: relative;
-  z-index: 1;
-  overflow: hidden; /* Ensure the gradient stays within the circle */
-  border-color: transparent; /* Make the border transparent when there are events */
+position: relative;
+z-index: 1;
+overflow: hidden; /* Ensure the gradient stays within the circle */
+border-color: transparent; /* Make the border transparent when there are events */
 }
 
 /* Make sure the gradient fills the entire circle including the border */
 .day-ring.has-events::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 50%;
-  z-index: -1;
+content: '';
+position: absolute;
+top: -2px;
+left: -2px;
+right: -2px;
+bottom: -2px;
+border-radius: 50%;
+z-index: -1;
 }
 
 /* Make sure the day number stays on top of the background */
 .day-ring.has-events span {
-  position: relative;
-  z-index: 2;
-  color: white; /* Make text white for better contrast on colored backgrounds */
-  font-weight: bold; /* Make the text bold for better visibility */
+position: relative;
+z-index: 2;
+color: white; /* Make text white for better contrast on colored backgrounds */
+font-weight: bold; /* Make the text bold for better visibility */
+text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Add shadow for better readability */
 }
 
 /* Day-ring hover effect - adjust for events */
 .day-ring.has-events:hover {
-  transform: scale(1.05);
-  /* No border color change as we want to show the event colors */
+transform: scale(1.05);
+/* No border color change as we want to show the event colors */
 }
 
 /* Selected day styling - make it compatible with event colors */
 .day-ring.has-events.selected-day {
-  box-shadow: 0 0 0 2px rgb(168, 100, 35);
+box-shadow: 0 0 0 2px var(--primary-dark);
 }
 
 /* Calendar event color mapping (bold versions of event colors) */
 :root {
-  --calendar-red: #ff8080;
-  --calendar-pink: #ff8dff;
-  --calendar-purple: #806dff;
-  --calendar-blue: #6ea8ff;
-  --calendar-green: #528d52;
-  --calendar-yellow: #9f9f00;
-  --calendar-orange: #feb770;
+--calendar-red: var(--event-type-appointment);
+--calendar-pink: var(--event-type-deadline);
+--calendar-purple: var(--event-type-meeting);
+--calendar-blue: var(--event-type-personal);
+--calendar-green: var(--event-type-task);
+--calendar-yellow: var(--event-type-reminder);
+--calendar-orange: var(--event-type-other);
 }
