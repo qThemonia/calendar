@@ -560,9 +560,7 @@ updateStatsTiles(filteredData) {
         canvas.style.height = 'auto';
         canvas.style.display = 'block';
         canvas.style.margin = '0 auto';
-        canvas.style.backgroundColor = 'rgb(255, 245, 235)';
         canvas.style.borderRadius = '8px';
-        canvas.style.border = '1px solid rgb(255, 158, 68)';
         
         this.chartContainer.appendChild(canvas);
         
@@ -578,7 +576,7 @@ updateStatsTiles(filteredData) {
         // Draw the chart
         this.drawCompletionChart(canvas, chartData);
       }
-    
+      
       drawCompletionChart(canvas, chartData) {
         try {
           // Clear any existing chart
@@ -594,13 +592,33 @@ updateStatsTiles(filteredData) {
             canvas.parentNode.replaceChild(noDataMsg, canvas);
             return;
           }
-      
+
           // Prepare data for Chart.js
           const labels = chartData.map(d => d.date);
           const data = chartData.map(d => d.completionRate);
           
           // Get the 2D context from the canvas
           const ctx = canvas.getContext('2d');
+          
+          // Get theme colors from CSS variables
+          const buttonColor = getComputedStyle(document.documentElement).getPropertyValue('--button-background').trim();
+          const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+          const panelBgColor = getComputedStyle(document.documentElement).getPropertyValue('--panel-background').trim();
+          const panelBorderColor = getComputedStyle(document.documentElement).getPropertyValue('--panel-border').trim();
+          
+          // Get the current theme name from the body attribute
+          const currentTheme = document.body.getAttribute('data-theme') || 'default';
+          
+          // Theme-specific fill colors
+          const fillColors = {
+            'default': 'rgba(255, 190, 105, 0.7)', // Light amber/orange
+            'blue': 'rgba(125, 185, 240, 0.7)',    // Light blue
+            'green': 'rgba(165, 215, 165, 0.7)',   // Light green
+            'purple': 'rgba(180, 160, 220, 0.7)'   // Light purple
+          };
+          
+          // Use the theme-specific fill color or fallback to green if theme not found
+          const fillColor = fillColors[currentTheme] || 'rgba(102, 187, 106, 0.2)';
           
           // Create the chart with Chart.js
           this.chart = new Chart(ctx, {
@@ -610,13 +628,13 @@ updateStatsTiles(filteredData) {
               datasets: [{
                 label: 'Completion Rate',
                 data: data,
-                backgroundColor: 'rgba(255, 158, 68, 0.2)',
-                borderColor: 'rgb(255, 158, 68)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgb(255, 145, 40)',
-                pointBorderColor: 'rgb(168, 100, 35)',
-                pointRadius: 5,
-                pointHoverRadius: 8,
+                backgroundColor: fillColor,
+                borderColor: buttonColor,
+                borderWidth: 3,
+                pointBackgroundColor: buttonColor,
+                pointBorderColor: buttonColor,
+                pointRadius: 6,
+                pointHoverRadius: 9,
                 tension: 0.1,
                 fill: true
               }]
@@ -629,17 +647,17 @@ updateStatsTiles(filteredData) {
                   display: true,
                   position: 'top',
                   labels: {
-                    color: 'rgb(133, 68, 12)',
+                    color: textColor,
                     font: {
                       weight: 'bold'
                     }
                   }
                 },
                 tooltip: {
-                  backgroundColor: 'rgb(255, 235, 218)',
-                  titleColor: 'rgb(133, 68, 12)',
-                  bodyColor: 'rgb(133, 68, 12)',
-                  borderColor: 'rgb(255, 158, 68)',
+                  backgroundColor: panelBgColor,
+                  titleColor: textColor,
+                  bodyColor: textColor,
+                  borderColor: panelBorderColor,
                   borderWidth: 1,
                   caretSize: 10,
                   cornerRadius: 6,
@@ -657,27 +675,27 @@ updateStatsTiles(filteredData) {
                   max: 105,
                   ticks: {
                     callback: function(value) {
-                        // Only show percentage on values up to 100
-                        return value <= 100 ? value + '%' : '';
-                      },
-                    color: 'rgb(133, 68, 12)',
+                      // Only show percentage on values up to 100
+                      return value <= 100 ? value + '%' : '';
+                    },
+                    color: textColor,
                     font: {
                       weight: 'bold'
                     }
                   },
                   grid: {
-                    color: 'rgba(168, 100, 35, 0.1)'
+                    color: 'rgba(0, 0, 0, 0.2)' // Light gray grid lines
                   }
                 },
                 x: {
                   ticks: {
-                    color: 'rgb(133, 68, 12)',
+                    color: textColor,
                     font: {
                       weight: 'bold'
                     }
                   },
                   grid: {
-                    color: 'rgba(168, 100, 35, 0.1)'
+                    color: 'rgba(0, 0, 0, 0.2)' // Light gray grid lines
                   }
                 }
               }
