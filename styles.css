@@ -17,7 +17,7 @@ html,body{
 
 #home-ui-container{
     background-color: var(--app-background);
-    grid-template-columns: 25vw auto 30vw;
+    grid-template-columns: minmax(400px,28vw) auto minmax(400px,28vw);
     display: grid;
     grid-template-rows: 5% auto;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
