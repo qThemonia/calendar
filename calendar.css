@@ -114,7 +114,7 @@ min-width: 0;
 
 .current-day {
   border-color: var(--primary);
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: white;
 }
 
 .current-day span {
