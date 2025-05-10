@@ -1,0 +1,85 @@
+/* welcome-name.css - Styles for the name customization feature */
+
+#welcome-name-container {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .welcome-container {
+    display: inline-block;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    cursor: default;
+    position: relative;
+  }
+  
+  .welcome-prompt {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    font-weight: bold;
+    padding: 5px 15px;
+    cursor: pointer;
+  }
+  
+  .welcome-message {
+    font-size: 2.2rem;
+    color: var(--text-primary);
+    font-weight: bold;
+  }
+  
+  .welcome-text {
+    color: var(--text-primary);
+  }
+  
+  .user-name {
+    color: var(--primary-dark);
+    position: relative;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .user-name:hover {
+    animation: border-glow 0.7s infinite alternate;
+  }
+  
+  @keyframes border-glow {
+    from {
+      box-shadow: 0 0 0 0 white;
+    }
+    to {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255);
+    }
+  }
+  
+  .name-input {
+    font-size: 2.5rem;
+    padding: 8px 15px;
+    border: none;
+    outline: none;
+    width: 180px;
+    color: var(--primary-dark);
+    background-color: transparent;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .welcome-message,
+    .welcome-prompt {
+      font-size: 1.4rem;
+    }
+    
+    .name-input {
+      font-size: 1.3rem;
+      width: 150px;
+    }
+  }

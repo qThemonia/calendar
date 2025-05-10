@@ -1,9 +1,11 @@
-// Updated renderer.js with event history support
+// Updated renderer.js with help button integration
 import { passQuotes } from './quotes.js';
 import { ChecklistManager } from './checklist.js';
 import { CalendarManager } from './calendar.js';
 import { EventManager } from './events.js';
 import { initTheme } from './themes.js';
+import { createHelpButton } from './help-tour.js';
+import { WelcomeManager } from './welcome-name.js';
 
 async function updateApp() {
     // Check for new version
@@ -145,6 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Select and display a random quote
   selectQuote();
   
+  // Initialize the welcome name manager
+  const welcomeManager = new WelcomeManager('welcome-name-container');
+  
   // Initialize the calendar first (without event manager)
   const calendarManager = new CalendarManager('calendar-container');
   
@@ -159,10 +164,23 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Connect event manager to checklist for updates
   eventManager.checklistManager = checklistManager;
+  
+  // Store references to managers in a global object for easy access
+  window.appManagers = {
+    calendarManager,
+    eventManager,
+    checklistManager,
+    welcomeManager
+  };
+  
+  // Initialize drag and drop functionality
   setTimeout(initDragAndDrop, 1000);
 
   // Set up a single centralized midnight trigger
   setupMidnightTrigger();
+
+  // Add the help button
+  createHelpButton();
 
   // Check for updates
   // Uncomment when ready to use auto-updates
